@@ -1,0 +1,70 @@
+---
+title: "Uisng Ratio to Camparing US to EU Countries"
+author: "David J Jackson"
+date: "6/29/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(RSQLite)
+library(tidyverse)
+```
+
+### Countries in The EU
+
+* Austria, Belgium, Bulgaria, Croatia, 
+* Republic of Cyprus, Czech Republic, Denmark, 
+* Estonia, Finland, France, Germany, 
+* Greece, Hungary, Ireland, Italy, 
+* Latvia, Lithuania, Luxembourg, Malta, 
+* Netherlands, Poland, Portugal, Romania, 
+* Slovakia, Slovenia, Spain and Sweden.
+
+## Using Ratios to compare US COVID-19 stats to Another Country
+
+```{r, echo=FALSE}
+rm(list=ls())
+db <- dbConnect(SQLite(), dbname="../COVIDDB/CORVID.sqlite3")
+ECDC <- dbGetQuery(db, "SELECT Countries,Population FROM ECDC")
+ECDC <- ECDC %>% select(Countries,Population)  %>% group_by(Countries,Population) %>% summarise(Count =n())
+
+EU <- read_csv("../db/EU_countries.csv")
+```
+```{r}
+JHU <- dbGetQuery(db, "SELECT country,confirmed,deaths FROM JHUDATA WHERE date ='2020-06-29'")
+dbDisconnect(db)
+```
+
+### Combine EU Counties with ECDC and JHU 
+
+```{r}
+DATA <- left_join(EU,ECDC,by="Countries")
+colnames(DATA) <- c("country","Population","Count")
+ATAD <- left_join(DATA,JHU,by="country")
+```
+### Reported Cases
+
+```{r, echo=FALSE}
+A = 331000000 # US Population
+B = 126000    # US cases
+C = 66647112   # Great Britan
+#   # -----------------
+# A:B = C:X
+X =(B*C)/A
+X
+
+```
+
+### Reported Deaths
+
+```{r, echo=FALSE}
+A = 331000000 # US Population
+B = 126140    # US Deaths
+C = 66647112   # Great Britain
+#   # -----------------
+# A:B = C:X
+X =(B*C)/A
+X
+```
+
