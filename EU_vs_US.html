@@ -383,34 +383,40 @@ summary {
 </div>
 <div id="using-ratios-to-compare-us-covid-19-stats-to-another-country" class="section level2">
 <h2>Using Ratios to compare US COVID-19 stats to Another Country</h2>
-<pre class="r"><code>rm(list=ls())
-db &lt;- dbConnect(SQLite(), dbname=&quot;../COVIDDB/CORVID.sqlite3&quot;)
-ECDC &lt;- dbGetQuery(db, &quot;SELECT Countries,Population FROM ECDC&quot;)
-
-ECDC &lt;- ECDC %&gt;% select(Countries,Population)  %&gt;% group_by(Countries,Population) %&gt;% summarise(Count =n())</code></pre>
 <pre><code>## `summarise()` regrouping output by &#39;Countries&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   Countries = col_character()
+## )</code></pre>
+<pre><code>## Warning: 26 parsing failures.
+## row col  expected    actual                     file
+##   1  -- 1 columns 2 columns &#39;../db/EU_countries.csv&#39;
+##   2  -- 1 columns 2 columns &#39;../db/EU_countries.csv&#39;
+##   3  -- 1 columns 2 columns &#39;../db/EU_countries.csv&#39;
+##   4  -- 1 columns 2 columns &#39;../db/EU_countries.csv&#39;
+##   5  -- 1 columns 2 columns &#39;../db/EU_countries.csv&#39;
+## ... ... ......... ......... ........................
+## See problems(...) for more details.</code></pre>
 <pre class="r"><code>JHU &lt;- dbGetQuery(db, &quot;SELECT country,confirmed,deaths FROM JHUDATA WHERE date =&#39;2020-06-29&#39;&quot;)
 dbDisconnect(db)</code></pre>
-<div id="reported-cases" class="section level3">
-<h3>Reported Cases</h3>
-<pre class="r"><code>A = 331000000 # US Population
-B = 126000    # US cases
-C = 66647112   # Great Britan
-#   # -----------------
-# A:B = C:X
-X =(B*C)/A
-X</code></pre>
+<div id="combine-eu-counties-with-ecdc-and-jhu" class="section level3">
+<h3>Combine EU Counties with ECDC and JHU</h3>
+<pre class="r"><code>DATA &lt;- left_join(EU,ECDC,by=&quot;Countries&quot;)
+colnames(DATA) &lt;- c(&quot;country&quot;,&quot;Population&quot;,&quot;Count&quot;)
+ATAD &lt;- left_join(DATA,JHU,by=&quot;country&quot;)</code></pre>
+</div>
+<div id="reported-casesusing-ratio" class="section level3">
+<h3>Reported Cases(Using Ratio)</h3>
+<ul>
+<li>A = US Population</li>
+<li>B = US Cases/Deaths</li>
+<li>C = Target Country Population</li>
+<li>X = Predicted Cases/Deaths</li>
+</ul>
 <pre><code>## [1] 25370.2</code></pre>
 </div>
-<div id="reported-deaths" class="section level3">
-<h3>Reported Deaths</h3>
-<pre class="r"><code>A = 331000000 # US Population
-B = 126140    # US Deaths
-C = 66647112   # Great Britain
-#   # -----------------
-# A:B = C:X
-X =(B*C)/A
-X</code></pre>
+<div id="reported-deaths-using-ratio" class="section level3">
+<h3>Reported Deaths (Using Ratio)</h3>
 <pre><code>## [1] 25398.39</code></pre>
 </div>
 </div>

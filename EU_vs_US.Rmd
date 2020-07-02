@@ -29,8 +29,9 @@ db <- dbConnect(SQLite(), dbname="../COVIDDB/CORVID.sqlite3")
 ECDC <- dbGetQuery(db, "SELECT Countries,Population FROM ECDC")
 ECDC <- ECDC %>% select(Countries,Population)  %>% group_by(Countries,Population) %>% summarise(Count =n())
 
-EU <- read_csv("../db/EU_countries.csv")
+EU <- data.table::fread("../db/EU_countries.csv")
 ```
+
 ```{r}
 JHU <- dbGetQuery(db, "SELECT country,confirmed,deaths FROM JHUDATA WHERE date ='2020-06-29'")
 dbDisconnect(db)
@@ -38,12 +39,17 @@ dbDisconnect(db)
 
 ### Combine EU Counties with ECDC and JHU 
 
-```{r}
+```{r,echo=FALSE}
 DATA <- left_join(EU,ECDC,by="Countries")
 colnames(DATA) <- c("country","Population","Count")
 ATAD <- left_join(DATA,JHU,by="country")
 ```
-### Reported Cases
+
+### Reported Cases(Using Ratio)
+* A = US Population
+* B = US Cases/Deaths
+* C = Target Country Population
+* X = Predicted Cases/Deaths
 
 ```{r, echo=FALSE}
 A = 331000000 # US Population
@@ -56,7 +62,7 @@ X
 
 ```
 
-### Reported Deaths
+### Reported Deaths (Using Ratio)
 
 ```{r, echo=FALSE}
 A = 331000000 # US Population
@@ -68,3 +74,8 @@ X =(B*C)/A
 X
 ```
 
+## New with Population Ratio
+```{r}
+X = (A/C) * B
+X
+```
