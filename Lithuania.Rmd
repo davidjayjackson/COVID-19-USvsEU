@@ -1,7 +1,7 @@
 ---
 title: 'Lithuania: COVID-19 Analysis'
 author: "David Jackson"
-date: "12/16/2020"
+date: "12/21/2020 09:45 PM/EST"
 output: 
   html_document: 
     fig_width: 8
@@ -27,13 +27,13 @@ db <- db <- dbConnect(RSQLite::SQLite(),dbname= "../COVID-19-DB/OURWORLD.sqlite3
 EU <- dbGetQuery(db,"select * from JHU ")
 df <- dbGetQuery(db,"select * from JHU where location ='Lithuania'")
 
-#df <- subset(df,location =="Sweden"  )
+#df <- subset(df,location =="Lithuania"  )
 df$date <- as.Date(df$date)
 EU$date <- as.Date(EU$date)
 df <- df[order(df$date),]
 EU <- EU[order(EU$date),]
-df$CMA <- ma(df$new_cases,7)
-df$DMA <- ma(df$new_deaths,7)
+df$CMA <- ma(df$new_cases,14)
+df$DMA <- ma(df$new_deaths,14)
 dbDisconnect(db)
 ```
 
@@ -43,7 +43,7 @@ dbDisconnect(db)
 df %>% filter(date >="2020-03-11" & new_cases >0) %>%
 ggplot() + geom_line(aes(x=date,y=new_cases)) +
   geom_smooth(aes(x=date,y=new_cases),span=0.25) +
-  labs(title="Sweden Daily Dailycases")
+  labs(title="Lithuania Daily Dailycases")
 
 ggplot(df) + geom_line(aes(x=date,y=CMA),col="red") + 
   labs(title="Seven Day Moving Average: Cases")
@@ -56,7 +56,7 @@ ggplot(df) + geom_line(aes(x=date,y=CMA),col="red") +
 df %>% filter(date>="2020-03-11" & new_deaths>0) %>%
 ggplot() +  geom_line(aes(x=date,y=new_deaths)) +
   geom_smooth(aes(x=date,y=new_deaths),span=0.25) +
-  labs(title="Sweden Daily Deaths") 
+  labs(title="Lithuania Daily Deaths") 
 
 ggplot(df) + geom_line(aes(x=date,y=DMA),col="red") + 
   labs(title="Seven Day Moving Average: Deaths")
@@ -111,7 +111,7 @@ ggplot(Monthly_new_deaths) + geom_col(aes(x=Monthly,y=new_deaths)) +
   scale_y_continuous(labels = scales::comma)
 ```
 
-#### Sweden in the EU: Covid-19 Cases and Deaths
+#### Lithuania in the EU: Covid-19 Cases and Deaths
 * EU Counties with Population between 1,000,000 and 3,000,000
 
 ```{r}
